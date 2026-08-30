@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <th:block th:replace="~{fragments :: appHead('Restaurant orders')}"></th:block>
+</head>
+<body>
+<header th:replace="~{fragments :: reactHeader('Restaurant orders', 'restaurant')}"></header>
+
+<main class="ui-page">
+  <div><p class="ui-kicker">Order management</p><h1 class="ui-title">Customer orders</h1><p class="ui-subtitle">Review incoming orders and mark them as accepted.</p></div>
+  <section class="ui-card mt-8 p-4 sm:p-6">
+    <div class="ui-table-wrap">
+      <table class="ui-table">
+        <thead><tr><th>ID</th><th>Delivery address</th><th>Status</th><th>Payment</th><th>Quantity</th><th>Total</th><th>Food</th><th>Customer</th><th class="text-right">Action</th></tr></thead>
+        <tbody>
+        <tr th:each="order : ${orders}">
+          <td class="font-black text-slate-900">#<span th:text="${order.id}">0</span></td>
+          <td><p class="max-w-xs leading-6" th:text="${order.deliveryAddress}">Address</p></td>
+          <td><span class="ui-badge" th:classappend="${order.orderStatus == 'Accepted'} ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'" th:text="${order.orderStatus}">Status</span></td>
+          <td class="whitespace-nowrap" th:text="${order.paymentMethod}">Payment</td>
+          <td th:text="${order.quantity}">1</td>
+          <td class="whitespace-nowrap font-black text-slate-900">&#8377;<span th:text="${order.totalPrice}">0</span></td>
+          <td>
+            <p class="whitespace-nowrap font-bold text-slate-900"
+               th:text="${order.food != null ? order.food.foodName : '-'}">Food</p>
+            <p class="mt-1 text-xs text-slate-400"
+               th:if="${order.food != null}">ID #<span th:text="${order.food.id}">0</span></p>
+          </td>
+          <td>
+            <p class="whitespace-nowrap font-bold text-slate-900"
+               th:text="${order.user != null ? order.user.name : '-'}">Customer</p>
+            <p class="mt-1 whitespace-nowrap text-xs text-slate-400"
+               th:if="${order.user != null}"
+               th:text="${order.user.email}">Email</p>
+          </td>
+          <td class="text-right"><a th:if="${order.orderStatus != 'Accepted'}" th:href="@{/acceptOrder(id=${order.id})}" class="ui-button-success min-h-9 px-4 py-2">Accept</a><span th:if="${order.orderStatus == 'Accepted'}" class="text-sm font-bold text-emerald-600">Accepted</span></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div th:if="${#lists.isEmpty(orders)}" class="ui-empty mt-4">There are no customer orders yet.</div>
+  </section>
+</main>
+
+<th:block th:replace="~{fragments :: reactScripts}"></th:block>
+</body>
+</html>

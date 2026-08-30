@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments :: appHead('Menu items')}"></th:block>
+</head>
+<body>
+<header th:replace="~{fragments :: reactHeader('Menu items', 'restaurant')}"></header>
+
+<main class="ui-page">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div><p class="ui-kicker">Restaurant menu</p><h1 class="ui-title">Food items</h1><p class="ui-subtitle">Manage every dish customers can order.</p></div>
+        <a th:href="@{/foodRegister}" class="ui-button-primary">Add food</a>
+    </div>
+    <section class="ui-card mt-8 p-4 sm:p-6">
+        <div class="ui-table-wrap">
+            <table class="ui-table">
+                <thead><tr><th>Food</th><th>Category</th><th>Price</th><th>Description</th><th class="text-right">Actions</th></tr></thead>
+                <tbody>
+                <tr th:each="food : ${foodList}">
+                    <td><div class="flex min-w-52 items-center gap-3"><img th:src="@{'/images/' + ${food.image}}" alt="Food" class="h-16 w-20 rounded-xl object-cover"><div><p class="font-black text-slate-900" th:text="${food.foodName}">Food</p><p class="mt-1 text-xs text-slate-400">ID #<span th:text="${food.id}">0</span></p></div></div></td>
+                    <td class="whitespace-nowrap"><span class="ui-badge bg-violet-100 text-violet-700" th:text="${food.category.categoryName}">Category</span></td>
+                    <td class="whitespace-nowrap font-black text-brand-600">&#8377;<span th:text="${food.price}">0</span></td>
+                    <td><p class="max-w-xs text-sm leading-6" th:text="${food.description}">Description</p></td>
+                    <td><div class="flex justify-end gap-2"><a th:href="@{/editFood/{id}(id=${food.id})}" class="ui-button-secondary min-h-9 px-4 py-2">Edit</a><a th:href="@{/deleteFood/{id}(id=${food.id})}" class="inline-flex min-h-9 items-center rounded-xl bg-rose-50 px-4 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100" onclick="return confirm('Are you sure you want to delete this food?')">Delete</a></div></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${#lists.isEmpty(foodList)}" class="ui-empty mt-4">Your menu is empty. Add your first food item.</div>
+    </section>
+</main>
+
+<th:block th:replace="~{fragments :: reactScripts}"></th:block>
+</body>
+</html>

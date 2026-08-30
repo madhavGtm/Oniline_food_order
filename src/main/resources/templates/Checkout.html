@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments :: appHead('Checkout')}"></th:block>
+</head>
+<body>
+<header th:replace="~{fragments :: reactHeader('Checkout', 'user')}"></header>
+
+<main class="ui-page">
+    <div><p class="ui-kicker">Secure checkout</p><h1 class="ui-title">Complete your order</h1><p class="ui-subtitle">Confirm your delivery details and payment method.</p></div>
+
+    <form th:action="@{/placeOrder}" method="post" class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_24rem]">
+        <section class="ui-card p-6 sm:p-8">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-5"><span class="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 font-black text-brand-700">1</span><h2 class="text-xl font-black">Delivery information</h2></div>
+            <div class="mt-6 grid gap-5 sm:grid-cols-2">
+                <div><label for="name" class="ui-label">Name</label><input id="name" type="text" name="name" th:value="${user.name}" class="ui-input ui-input-readonly" readonly></div>
+                <div><label for="email" class="ui-label">Email</label><input id="email" type="email" name="email" th:value="${user.email}" class="ui-input ui-input-readonly" readonly></div>
+                <div class="sm:col-span-2"><label for="contact" class="ui-label">Contact number</label><input id="contact" type="tel" name="contact" th:value="${user.contact}" class="ui-input" autocomplete="tel" required></div>
+                <div class="sm:col-span-2"><label for="address" class="ui-label">Delivery address</label><textarea id="address" name="address" th:text="${user.address}" class="ui-input min-h-28 resize-y" autocomplete="street-address" required></textarea></div>
+                <div class="sm:col-span-2"><label for="paymentMethod" class="ui-label">Payment method</label><select id="paymentMethod" name="paymentMethod" class="ui-input" required><option value="Cash On Delivery">Cash on delivery</option><option value="UPI">UPI</option><option value="Debit Card">Debit card</option><option value="Credit Card">Credit card</option></select></div>
+            </div>
+        </section>
+
+        <aside class="ui-card h-fit overflow-hidden lg:sticky lg:top-28">
+            <div class="border-b border-slate-100 p-6"><p class="ui-kicker">Order summary</p><h2 class="mt-2 text-xl font-black">Your items</h2></div>
+            <div class="max-h-80 divide-y divide-slate-100 overflow-y-auto px-6">
+                <div th:each="cart : ${cartList}" class="flex gap-4 py-4">
+                    <div class="min-w-0 flex-1"><p class="truncate font-black text-slate-900" th:text="${cart.food.foodName}">Food</p><p class="mt-1 truncate text-xs text-slate-500" th:text="${cart.food.restaurant.restaurantName}">Restaurant</p><p class="mt-1 text-xs font-semibold text-slate-400">Qty <span th:text="${cart.quantity}">1</span></p></div>
+                    <p class="whitespace-nowrap font-black text-slate-900">&#8377;<span th:text="${cart.price * cart.quantity}">0</span></p>
+                </div>
+            </div>
+            <div class="bg-slate-950 p-6 text-white">
+                <div class="flex items-end justify-between gap-4"><span class="text-sm font-semibold text-slate-400">Grand total</span><span class="text-3xl font-black">&#8377;<span th:text="${total}">0</span></span></div>
+                <button type="submit" class="ui-button-primary mt-6 w-full">Place order</button>
+                <a th:href="@{/showCart}" class="mt-3 block text-center text-sm font-bold text-slate-400 hover:text-white">&larr; Back to cart</a>
+            </div>
+        </aside>
+    </form>
+</main>
+
+<th:block th:replace="~{fragments :: reactScripts}"></th:block>
+</body>
+</html>

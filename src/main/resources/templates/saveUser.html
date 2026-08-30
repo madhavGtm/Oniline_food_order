@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments :: appHead('Account created')}"></th:block>
+</head>
+<body>
+<header th:replace="~{fragments :: reactHeader('Account created', 'public')}"></header>
+
+<main class="ui-page grid min-h-[calc(100vh-4.5rem)] place-items-center">
+    <section class="ui-card max-w-lg p-8 text-center sm:p-12">
+        <span class="mx-auto grid h-20 w-20 place-items-center rounded-full bg-emerald-100 text-4xl font-black text-emerald-700" aria-hidden="true">&#10003;</span>
+        <p class="ui-kicker mt-7 text-emerald-600">Registration complete</p>
+        <h1 class="ui-title">Your account is ready</h1>
+        <p class="ui-subtitle mx-auto">Sign in now to start exploring local restaurants.</p>
+        <a th:href="@{/login}" class="ui-button-primary mt-8">Continue to sign in</a>
+    </section>
+</main>
+
+<th:block th:replace="~{fragments :: reactScripts}"></th:block>
+</body>
+</html>

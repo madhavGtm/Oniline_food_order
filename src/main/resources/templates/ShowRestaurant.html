@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments :: appHead('All restaurants')}"></th:block>
+</head>
+<body>
+<header th:replace="~{fragments :: reactHeader('All Restaurants', 'admin')}"></header>
+
+<main class="ui-page">
+    <div class="flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <p class="ui-kicker">Restaurant management</p>
+            <h1 class="ui-title">All Restaurants</h1>
+            <p class="ui-subtitle">View and manage every restaurant registered with Quick Bite.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <a th:href="@{/adminHome}" class="ui-button-secondary">&larr; Dashboard</a>
+            <a th:href="@{/RestaurantRegister}" class="ui-button-primary">+ Add Restaurant</a>
+        </div>
+    </div>
+
+    <section class="ui-card mt-6 p-4 sm:p-6">
+        <div id="restaurant-search-root" class="mb-5"></div>
+
+        <div class="ui-table-wrap">
+            <table class="ui-table">
+                <thead>
+                <tr>
+                    <th>Restaurant</th>
+                    <th>Contact</th>
+                    <th>Address</th>
+                    <th>Working Hours</th>
+                    <th>Status</th>
+                    <th class="text-right">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="restaurant : ${restaurants}"
+                    data-restaurant-row
+                    th:attr="data-search=|${restaurant.restaurantName} ${restaurant.email} ${restaurant.contact} ${restaurant.address}|">
+                    <td>
+                        <div class="flex min-w-56 items-center gap-3">
+                            <img th:if="${restaurant.image != null}"
+                                 th:src="@{'/images/' + ${restaurant.image}}"
+                                 alt="Restaurant"
+                                 class="h-14 w-14 rounded-xl object-cover shadow-sm">
+                            <span th:if="${restaurant.image == null}"
+                                  class="grid h-14 w-14 place-items-center rounded-xl bg-brand-50 text-2xl">&#127869;</span>
+                            <div class="min-w-0">
+                                <p class="truncate font-black text-slate-950" th:text="${restaurant.restaurantName}">Restaurant</p>
+                                <p class="mt-1 truncate text-xs text-slate-400">ID #<span th:text="${restaurant.id}">0</span> &bull; <span th:text="${restaurant.email}">Email</span></p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="whitespace-nowrap font-semibold" th:text="${restaurant.contact}">Contact</td>
+                    <td><p class="max-w-xs leading-5" th:text="${restaurant.address}">Address</p></td>
+                    <td class="whitespace-nowrap"><span th:text="${restaurant.openingTime}">09:00</span> &ndash; <span th:text="${restaurant.closingTime}">22:00</span></td>
+                    <td><span class="ui-badge bg-emerald-50 text-emerald-700">Active</span></td>
+                    <td class="text-right">
+                        <a th:href="@{/DeleteRestaurant/{email}(email=${restaurant.email})}"
+                           class="inline-flex min-h-9 items-center rounded-lg bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100"
+                           onclick="return confirm('Delete this restaurant and its login account?')">Delete</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${#lists.isEmpty(restaurants)}" class="ui-empty mt-4">No restaurants have been registered yet.</div>
+        <div id="restaurant-search-empty" class="ui-empty mt-4 hidden">No restaurant matches your search.</div>
+    </section>
+</main>
+
+<th:block th:replace="~{fragments :: reactScripts}"></th:block>
+<script>
+    (function () {
+        var mountNode = document.getElementById('restaurant-search-root');
+        if (!mountNode || !window.React || !window.ReactDOM) return;
+        var e = React.createElement;
+
+        function RestaurantSearch() {
+            var queryState = React.useState('');
+            var query = queryState[0];
+            var setQuery = queryState[1];
+            var rows = Array.prototype.slice.call(document.querySelectorAll('[data-restaurant-row]'));
+            var visibleCount = rows.filter(function (row) { return !row.hidden; }).length;
+
+            React.useEffect(function () {
+                var normalizedQuery = query.trim().toLowerCase();
+                var count = 0;
+                rows.forEach(function (row) {
+                    var matches = !normalizedQuery || (row.dataset.search || '').toLowerCase().includes(normalizedQuery);
+                    row.hidden = !matches;
+                    if (matches) count += 1;
+                });
+                var emptyState = document.getElementById('restaurant-search-empty');
+                if (emptyState) emptyState.classList.toggle('hidden', count !== 0 || !normalizedQuery);
+            }, [query]);
+
+            return e('div', { className: 'flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between' },
+                e('label', { className: 'relative block w-full max-w-md' },
+                    e('span', { className: 'sr-only' }, 'Search restaurants'),
+                    e('span', { className: 'pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400' }, '\u2315'),
+                    e('input', {
+                        type: 'search',
+                        value: query,
+                        onChange: function (event) { setQuery(event.target.value); },
+                        placeholder: 'Search by restaurant, email, contact or address...',
+                        className: 'ui-input pl-10'
+                    })
+                ),
+                e('p', { className: 'text-xs font-bold text-slate-400' }, rows.length + ' registered restaurant' + (rows.length === 1 ? '' : 's'))
+            );
+        }
+
+        ReactDOM.createRoot(mountNode).render(e(RestaurantSearch));
+    }());
+</script>
+</body>
+</html>

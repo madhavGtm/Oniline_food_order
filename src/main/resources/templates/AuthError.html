@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments :: appHead('Access denied')}"></th:block>
+</head>
+<body>
+<header th:replace="~{fragments :: reactHeader('Access denied', 'public')}"></header>
+
+<main class="ui-page grid min-h-[calc(100vh-4.5rem)] place-items-center">
+    <section class="ui-card max-w-xl p-8 text-center sm:p-12">
+        <span class="mx-auto grid h-20 w-20 place-items-center rounded-3xl bg-rose-50 text-4xl" aria-hidden="true">!</span>
+        <p class="ui-kicker mt-7 text-rose-600">Authorization error</p>
+        <h1 class="ui-title">You don&apos;t have access to this page</h1>
+        <p class="ui-subtitle mx-auto">Sign in with an account that has permission to continue.</p>
+        <a th:href="@{/login}" class="ui-button-primary mt-8">Return to sign in</a>
+    </section>
+</main>
+
+<th:block th:replace="~{fragments :: reactScripts}"></th:block>
+</body>
+</html>

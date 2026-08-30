@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments :: appHead('Edit category')}"></th:block>
+</head>
+<body>
+<header th:replace="~{fragments :: reactHeader('Edit category', 'restaurant')}"></header>
+
+<main class="ui-page">
+    <section class="ui-card mx-auto max-w-xl p-6 sm:p-10">
+        <p class="ui-kicker">Menu organization</p><h1 class="ui-title">Edit category</h1><p class="ui-subtitle">Update how this category appears on your menu.</p>
+        <form th:action="@{/updateCategory}" method="post" class="mt-8 space-y-5">
+            <input type="hidden" name="id" th:value="${category.id}">
+            <div><label for="categoryName" class="ui-label">Category name</label><input id="categoryName" type="text" name="categoryName" th:value="${category.categoryName}" class="ui-input" required></div>
+            <div><label for="image" class="ui-label">Image name</label><input id="image" type="text" name="image" th:value="${category.image}" class="ui-input" required></div>
+            <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end"><a th:href="@{/showCategory}" class="ui-button-secondary">Cancel</a><button type="submit" class="ui-button-primary">Update category</button></div>
+        </form>
+    </section>
+</main>
+
+<th:block th:replace="~{fragments :: reactScripts}"></th:block>
+</body>
+</html>

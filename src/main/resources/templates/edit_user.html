@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments :: appHead('Edit profile')}"></th:block>
+</head>
+<body>
+<header th:replace="~{fragments :: reactHeader('Edit profile', 'user')}"></header>
+
+<main class="ui-page">
+    <section class="ui-card mx-auto max-w-2xl p-6 sm:p-10">
+        <p class="ui-kicker">Account settings</p><h1 class="ui-title">Edit your profile</h1><p class="ui-subtitle">Keep your delivery and contact information up to date.</p>
+        <form action="/update_user" method="post" class="mt-8 grid gap-5 sm:grid-cols-2">
+            <input type="hidden" name="email" th:value="${user.email}">
+            <div class="sm:col-span-2"><label for="name" class="ui-label">Full name</label><input id="name" type="text" name="name" th:value="${user.name}" class="ui-input" autocomplete="name" required></div>
+            <div class="sm:col-span-2"><label for="address" class="ui-label">Address</label><input id="address" type="text" name="address" th:value="${user.address}" class="ui-input" autocomplete="street-address" required></div>
+            <div><label for="contact" class="ui-label">Contact number</label><input id="contact" type="tel" name="contact" th:value="${user.contact}" class="ui-input" autocomplete="tel" required></div>
+            <div><label for="pincode" class="ui-label">Pincode</label><input id="pincode" type="text" name="pincode" th:value="${user.pincode}" class="ui-input" autocomplete="postal-code" required></div>
+            <div class="sm:col-span-2"><label for="password" class="ui-label">Password</label><input id="password" type="password" name="password" th:value="${user.password}" class="ui-input" autocomplete="current-password" required></div>
+            <div class="mt-2 flex flex-col-reverse gap-3 sm:col-span-2 sm:flex-row sm:justify-end"><a th:href="@{/UserHome}" class="ui-button-secondary">Cancel</a><button type="submit" class="ui-button-primary">Save changes</button></div>
+        </form>
+    </section>
+</main>
+
+<th:block th:replace="~{fragments :: reactScripts}"></th:block>
+</body>
+</html>

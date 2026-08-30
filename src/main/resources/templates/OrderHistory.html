@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <th:block th:replace="~{fragments :: appHead('My orders')}"></th:block>
+</head>
+<body>
+<header th:replace="~{fragments :: reactHeader('My orders', 'user')}"></header>
+
+<main class="ui-page max-w-5xl">
+  <div class="flex items-center justify-between gap-4 border-b border-slate-200 pb-5"><div><a th:href="@{/UserHome}" class="text-sm font-bold text-slate-500">&larr; Home</a><h1 class="ui-title">My Orders</h1></div><a th:href="@{/UserHome}" class="ui-button-primary">Order food</a></div>
+  <div class="mt-4 flex gap-6 overflow-x-auto border-b border-slate-200 text-sm font-bold"><span class="border-b-2 border-brand-500 px-1 py-3 text-brand-500">All Orders</span><span class="px-1 py-3 text-slate-500">Ongoing</span><span class="px-1 py-3 text-slate-500">Delivered</span></div>
+
+  <section class="mt-5 grid gap-4">
+    <article th:each="order : ${orders}" class="ui-card p-5">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><p class="text-xs font-bold text-slate-500">Order ID: <span class="text-slate-900">#<span th:text="${order.id}">0</span></span></p><div class="mt-4 flex items-center gap-4"><img th:src="@{'/images/' + ${order.food.image}}" alt="Food item" class="h-16 w-16 rounded-lg object-cover"><div><h2 class="font-black" th:text="${order.food.restaurant.restaurantName}">Restaurant</h2><p class="mt-1 text-sm text-slate-500"><span th:text="${order.food.foodName}">Food</span> &times; <span th:text="${order.quantity}">1</span></p><p class="mt-1 text-sm font-black">Total: &#8377;<span th:text="${order.totalPrice}">0</span></p></div></div></div><div class="sm:text-right"><span class="ui-badge bg-emerald-50 text-emerald-700" th:text="${order.orderStatus}">Status</span><p class="mt-3 text-xs text-slate-500" th:text="${order.paymentMethod}">Payment</p></div></div>
+    </article>
+    <div th:if="${#lists.isEmpty(orders)}" class="ui-empty">You have not placed any orders yet.</div>
+  </section>
+</main>
+
+<th:block th:replace="~{fragments :: reactScripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments :: appHead('Add food')}"></th:block>
+</head>
+<body>
+<header th:replace="~{fragments :: reactHeader('Add food', 'restaurant')}"></header>
+
+<main class="ui-page">
+    <section class="ui-card mx-auto max-w-3xl p-6 sm:p-10">
+        <div class="border-b border-slate-100 pb-7"><p class="ui-kicker">Build your menu</p><h1 class="ui-title">Add a food item</h1><p class="ui-subtitle">Give customers the details they need to choose their next meal.</p></div>
+        <form th:action="@{/saveFood}" method="post" enctype="multipart/form-data" class="mt-8 grid gap-5 sm:grid-cols-2">
+            <input type="hidden" name="restaurantId" th:value="${restaurant.id}">
+            <div><label for="foodName" class="ui-label">Food name</label><input id="foodName" type="text" name="foodName" class="ui-input" placeholder="Dish name" required></div>
+            <div><label for="price" class="ui-label">Price (&#8377;)</label><input id="price" type="number" name="price" step="0.01" min="0" class="ui-input" placeholder="0.00" required></div>
+            <div class="sm:col-span-2"><label for="description" class="ui-label">Description</label><textarea id="description" name="description" rows="4" class="ui-input min-h-28 resize-y" placeholder="Describe the dish" required></textarea></div>
+            <div class="sm:col-span-2"><label for="categoryId" class="ui-label">Category</label><select id="categoryId" name="categoryId" class="ui-input" required><option value="">Select a category</option><option th:each="c : ${categoryList}" th:value="${c.id}" th:text="${c.categoryName}">Category</option></select></div>
+            <div class="sm:col-span-2"><label for="imageFile" class="ui-label">Food image</label><input id="imageFile" type="file" name="imageFile" accept="image/*" class="ui-input file:mr-4 file:rounded-lg file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-bold file:text-brand-700" required></div>
+            <div class="mt-2 flex flex-col-reverse gap-3 sm:col-span-2 sm:flex-row sm:justify-end"><a th:href="@{/showFood}" class="ui-button-secondary">Cancel</a><button type="submit" class="ui-button-primary">Save food</button></div>
+        </form>
+    </section>
+</main>
+
+<th:block th:replace="~{fragments :: reactScripts}"></th:block>
+</body>
+</html>

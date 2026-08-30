@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments :: appHead('Edit food')}"></th:block>
+</head>
+<body>
+<header th:replace="~{fragments :: reactHeader('Edit food', 'restaurant')}"></header>
+
+<main class="ui-page">
+    <section class="ui-card mx-auto max-w-3xl p-6 sm:p-10">
+        <div class="border-b border-slate-100 pb-7"><p class="ui-kicker">Menu item</p><h1 class="ui-title">Edit food</h1><p class="ui-subtitle">Update the dish details, category, price, or image.</p></div>
+        <form th:action="@{/updateFood}" method="post" enctype="multipart/form-data" class="mt-8 grid gap-5 sm:grid-cols-2">
+            <input type="hidden" name="id" th:value="${food.id}">
+            <input type="hidden" name="oldImage" th:value="${food.image}">
+            <div><label for="foodName" class="ui-label">Food name</label><input id="foodName" type="text" name="foodName" th:value="${food.foodName}" class="ui-input" required></div>
+            <div><label for="price" class="ui-label">Price (&#8377;)</label><input id="price" type="number" step="0.01" min="0" name="price" th:value="${food.price}" class="ui-input" required></div>
+            <div class="sm:col-span-2"><label for="description" class="ui-label">Description</label><textarea id="description" name="description" rows="4" th:text="${food.description}" class="ui-input min-h-28 resize-y" required></textarea></div>
+            <div class="sm:col-span-2"><label for="categoryId" class="ui-label">Category</label><select id="categoryId" name="categoryId" class="ui-input" required><option th:each="c : ${categoryList}" th:value="${c.id}" th:text="${c.categoryName}" th:selected="${food.category != null && food.category.id == c.id}">Category</option></select></div>
+            <div><label class="ui-label">Current image</label><img th:src="@{'/images/' + ${food.image}}" alt="Current food" class="h-36 w-full rounded-xl object-cover"></div>
+            <div><label for="imageFile" class="ui-label">Upload a new image</label><input id="imageFile" type="file" name="imageFile" accept="image/*" class="ui-input file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-2 file:text-xs file:font-bold file:text-brand-700"><p class="mt-2 text-xs text-slate-400">Leave blank to keep the current image.</p></div>
+            <div class="mt-2 flex flex-col-reverse gap-3 sm:col-span-2 sm:flex-row sm:justify-end"><a th:href="@{/showFood}" class="ui-button-secondary">Cancel</a><button type="submit" class="ui-button-primary">Update food</button></div>
+        </form>
+    </section>
+</main>
+
+<th:block th:replace="~{fragments :: reactScripts}"></th:block>
+</body>
+</html>

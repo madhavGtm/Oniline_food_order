@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <th:block th:replace="~{fragments :: appHead('Create account')}"></th:block>
+</head>
+<body>
+<header th:replace="~{fragments :: reactHeader('Create account', 'public')}"></header>
+
+<main class="ui-page">
+  <section class="ui-card mx-auto max-w-3xl p-6 sm:p-10">
+    <div class="flex flex-col gap-4 border-b border-slate-100 pb-7 sm:flex-row sm:items-end sm:justify-between">
+      <div><p class="ui-kicker">Join Quick Bite</p><h1 class="ui-title">Create your account</h1><p class="ui-subtitle">A few details and you&apos;ll be ready to order.</p></div>
+      <span class="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-brand-50 text-2xl" aria-hidden="true">&#128075;</span>
+    </div>
+
+    <form action="/saveUser" method="post" class="mt-8 grid gap-5 sm:grid-cols-2">
+      <div><label for="name" class="ui-label">Full name</label><input id="name" type="text" name="name" class="ui-input" placeholder="Your full name" autocomplete="name" required></div>
+      <div><label for="contact" class="ui-label">Contact number</label><input id="contact" type="tel" name="contact" class="ui-input" placeholder="Your phone number" autocomplete="tel" required></div>
+      <div class="sm:col-span-2"><label for="address" class="ui-label">Delivery address</label><input id="address" type="text" name="address" class="ui-input" placeholder="Street, area and city" autocomplete="street-address" required></div>
+      <div><label for="email" class="ui-label">Email address</label><input id="email" type="email" name="email" class="ui-input" placeholder="you@example.com" autocomplete="email" required></div>
+      <div><label for="pincode" class="ui-label">Pincode</label><input id="pincode" type="text" name="pincode" class="ui-input" placeholder="Postal code" autocomplete="postal-code" inputmode="numeric" required></div>
+      <div class="sm:col-span-2"><label for="password" class="ui-label">Password</label><input id="password" type="password" name="password" class="ui-input" placeholder="Create a secure password" autocomplete="new-password" required></div>
+      <div class="mt-2 flex flex-col-reverse gap-3 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-sm text-slate-500">Already registered? <a th:href="@{/login}" class="font-bold text-brand-600">Sign in</a></p>
+        <button type="submit" class="ui-button-primary px-8">Create account</button>
+      </div>
+    </form>
+  </section>
+</main>
+
+<th:block th:replace="~{fragments :: reactScripts}"></th:block>
+</body>
+</html>

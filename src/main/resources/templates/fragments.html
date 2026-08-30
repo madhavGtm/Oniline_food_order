@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:fragment="appHead(pageTitle)">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="theme-color" content="#ff5a16">
+        <title th:text="${pageTitle}">Quick Bite</title>
+
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <style type="text/tailwindcss">
+            @theme {
+                --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                --color-brand-50: #fff4ed;
+                --color-brand-100: #ffe6d5;
+                --color-brand-200: #ffc9a9;
+                --color-brand-300: #ffa472;
+                --color-brand-400: #ff7a38;
+                --color-brand-500: #ff5a16;
+                --color-brand-600: #ef4308;
+                --color-brand-700: #c73208;
+                --color-brand-800: #9e2a0e;
+                --color-brand-900: #7f270f;
+            }
+
+            @layer base {
+                html {
+                    scroll-behavior: smooth;
+                    max-width: 100%;
+                    overflow-x: hidden;
+                    scrollbar-width: none;
+                    -ms-overflow-style: none;
+                }
+                html::-webkit-scrollbar { display: none; }
+                body { @apply min-h-screen max-w-full overflow-x-hidden bg-[#f6f7f9] font-sans text-slate-900 antialiased; }
+                main { position: relative; isolation: isolate; }
+                main::before {
+                    content: "";
+                    position: fixed;
+                    top: 5rem;
+                    right: -10rem;
+                    z-index: -1;
+                    width: 30rem;
+                    height: 30rem;
+                    border-radius: 42% 58% 63% 37% / 43% 39% 61% 57%;
+                    background: linear-gradient(135deg, rgba(255,90,22,.10), rgba(255,201,169,.20));
+                    filter: blur(2px);
+                    pointer-events: none;
+                }
+                main::after {
+                    content: "";
+                    position: fixed;
+                    bottom: -12rem;
+                    left: 12%;
+                    z-index: -1;
+                    width: 26rem;
+                    height: 26rem;
+                    border-radius: 64% 36% 47% 53% / 38% 55% 45% 62%;
+                    background: linear-gradient(135deg, rgba(16,185,129,.07), rgba(139,92,246,.06));
+                    pointer-events: none;
+                }
+                * { scrollbar-width: none; -ms-overflow-style: none; }
+                *::-webkit-scrollbar { display: none; }
+                ::selection { @apply bg-brand-200 text-brand-900; }
+                button, a, input, textarea, select { @apply transition-all duration-200; }
+                button, [role="button"] { @apply cursor-pointer; }
+                img { @apply max-w-full; }
+                :focus-visible { @apply outline-3 outline-offset-2 outline-brand-300; }
+                input:disabled, textarea:disabled, select:disabled { @apply cursor-not-allowed bg-slate-100 text-slate-400; }
+                @media (prefers-reduced-motion: reduce) {
+                    html { scroll-behavior: auto; }
+                    *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+                }
+            }
+
+            @layer components {
+                .dashboard-header + main { @apply lg:ml-64; }
+                .ui-shell { @apply mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-8; }
+                .ui-page { @apply mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8; }
+                .ui-card { @apply rounded-2xl border border-white/80 bg-white/95 shadow-[0_8px_30px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/70 backdrop-blur-sm transition duration-300 hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-[0_18px_42px_rgba(15,23,42,0.10)]; }
+                .ui-kicker { @apply text-[11px] font-extrabold uppercase tracking-[0.18em] text-brand-500; }
+                .ui-title { @apply mt-1.5 text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl; }
+                .ui-subtitle { @apply mt-2 max-w-2xl text-sm leading-6 text-slate-500; }
+                .ui-label { @apply mb-1.5 block text-xs font-bold text-slate-700; }
+                .ui-input { @apply block w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-inner shadow-slate-100/60 outline-none placeholder:text-slate-400 focus:border-brand-400 focus:bg-white focus:ring-4 focus:ring-brand-100; }
+                .ui-input:hover:not(:focus):not(:disabled) { @apply border-slate-300; }
+                .ui-input-readonly { @apply bg-slate-50 text-slate-500; }
+                .ui-button { @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-bold focus:outline-none focus:ring-3 disabled:cursor-not-allowed disabled:opacity-60; }
+                .ui-button-primary { @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 px-4 py-2 text-sm font-bold text-white shadow-[0_8px_20px_rgba(255,90,22,.22)] hover:from-brand-600 hover:to-brand-700 focus:outline-none focus:ring-4 focus:ring-brand-200 disabled:cursor-not-allowed disabled:opacity-60; }
+                .ui-button-secondary { @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700 focus:outline-none focus:ring-4 focus:ring-slate-200 disabled:cursor-not-allowed disabled:opacity-60; }
+                .ui-button-success { @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700 focus:outline-none focus:ring-3 focus:ring-emerald-200; }
+                .ui-button-danger { @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-bold text-white hover:bg-rose-700 focus:outline-none focus:ring-3 focus:ring-rose-200; }
+                .ui-button-dark { @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-bold text-white hover:bg-slate-800 focus:outline-none focus:ring-3 focus:ring-slate-300; }
+                .ui-table-wrap { @apply overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-inner shadow-slate-100; }
+                .ui-table { @apply min-w-full border-separate border-spacing-0 text-left text-sm; }
+                .ui-table thead { @apply bg-slate-50 text-slate-700; }
+                .ui-table th { @apply whitespace-nowrap border-b border-slate-200 px-4 py-3 text-[11px] font-extrabold uppercase tracking-wider; }
+                .ui-table td { @apply border-b border-slate-100 px-4 py-3 align-middle text-slate-600; }
+                .ui-table tbody tr:last-child td { @apply border-b-0; }
+                .ui-table tbody tr { @apply bg-white transition-colors hover:bg-orange-50/60; }
+                .ui-badge { @apply inline-flex items-center rounded-md px-2.5 py-1 text-xs font-bold; }
+                .ui-empty { @apply rounded-lg border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center text-sm text-slate-500; }
+                .stat-card { @apply flex items-center gap-4 rounded-2xl border border-white bg-white/95 p-5 shadow-[0_8px_28px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/70 transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_42px_rgba(15,23,42,0.10)]; }
+                .stat-icon { @apply grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-xl font-black shadow-inner; }
+                .ui-button-primary:hover, .ui-button-secondary:hover, .ui-button-success:hover, .ui-button-danger:hover, .ui-button-dark:hover { transform: translateY(-1px); }
+                .ui-button-primary:active, .ui-button-secondary:active, .ui-button-success:active, .ui-button-danger:active, .ui-button-dark:active { transform: translateY(0) scale(.98); }
+                button[aria-busy="true"] { @apply cursor-wait opacity-80; }
+                button[aria-busy="true"]::before {
+                    content: "";
+                    width: 1rem;
+                    height: 1rem;
+                    border: 2px solid currentColor;
+                    border-right-color: transparent;
+                    border-radius: 9999px;
+                    animation: quick-bite-spin .7s linear infinite;
+                }
+                .qb-reveal { opacity: 0; transform: translateY(18px) scale(.985); }
+                .qb-reveal.qb-reveal-visible { opacity: 1; transform: translateY(0) scale(1); transition: opacity .55s ease, transform .55s cubic-bezier(.2,.8,.2,1); }
+                .ui-card.qb-reveal.qb-reveal-visible:hover { transform: translateY(-2px) scale(1); }
+                .stat-card.qb-reveal.qb-reveal-visible:hover { transform: translateY(-4px) scale(1); }
+                .qb-route-progress { animation: quick-bite-progress 1.1s ease-in-out infinite; }
+            }
+
+            @keyframes quick-bite-spin { to { transform: rotate(360deg); } }
+            @keyframes quick-bite-progress {
+                0% { transform: translateX(-110%) scaleX(.35); }
+                55% { transform: translateX(70%) scaleX(.75); }
+                100% { transform: translateX(220%) scaleX(.35); }
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+<header th:fragment="reactHeader(pageTitle, area)"
+        th:class="${area == 'admin' or area == 'restaurant'} ? 'dashboard-header sticky top-0 z-50 border-b border-slate-800 bg-[#111923] lg:fixed lg:inset-y-0 lg:left-0 lg:w-64 lg:border-b-0 lg:border-r' : 'sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-xl'">
+    <div id="react-header-root" th:attr="data-title=${pageTitle},data-area=${area}"></div>
+    <noscript>
+        <div class="ui-shell flex min-h-16 items-center justify-between py-3">
+            <a th:href="@{/}" class="text-xl font-black text-brand-500">Quick Bite</a>
+            <span class="text-sm font-semibold text-slate-500" th:text="${pageTitle}">Page</span>
+        </div>
+    </noscript>
+</header>
+
+<th:block th:fragment="reactScripts">
+    <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+    <script>
+        (function () {
+            var mountNode = document.getElementById('react-header-root');
+            if (!mountNode || !window.React || !window.ReactDOM) return;
+
+            var e = React.createElement;
+            var navigation = {
+                public: [
+                    { label: 'Home', href: '/', icon: '\u2302' },
+                    { label: 'Sign in', href: '/login', icon: '\u2192' },
+                    { label: 'Create account', href: '/UserRegister', icon: '+' }
+                ],
+                user: [
+                    { label: 'Home', href: '/UserHome', icon: '\u2302' },
+                    { label: 'Restaurants', href: '/UserHome', icon: '\u25a6' },
+                    { label: 'My Orders', href: '/orderHistory', icon: '\u25a4' },
+                    { label: 'Cart', href: '/showCart', icon: '\u25a1' },
+                    { label: 'Logout', href: '/RestaurantLogout', icon: '\u2192' }
+                ],
+                restaurant: [
+                    { label: 'Dashboard', href: '/RestaurantHome', icon: '\u2302' },
+                    { label: 'Register Category', href: '/categoryRegister', icon: '\u25a6' },
+                    { label: 'Register Food', href: '/foodRegister', icon: '+' },
+                    { label: 'View Categories', href: '/showCategory', icon: '\u25a4' },
+                    { label: 'View Foods', href: '/showFood', icon: '\u25c7' },
+                    { label: 'Show Orders', href: '/showOrders', icon: '\u25a3' },
+                    { label: 'Restaurant Profile', href: '/RestaurantHome', icon: '\u25a1' },
+                    { label: 'Logout', href: '/RestaurantLogout', icon: '\u2192' }
+                ],
+                admin: [
+                    { label: 'Dashboard', href: '/adminHome', icon: '\u2302' },
+                    { label: 'All Restaurants', href: '/ShowRestaurants', icon: '\u25a6' },
+                    { label: 'Add Restaurant', href: '/RestaurantRegister', icon: '+' },
+                    { label: 'Admin Profile', href: '/adminHome', icon: '\u25a1' },
+                    { label: 'Logout', href: '/RestaurantLogout', icon: '\u2192' }
+                ]
+            };
+
+            function Brand(props) {
+                return e('a', { href: props.home, className: 'group flex items-center gap-3', 'aria-label': 'Quick Bite home' },
+                    e('span', { className: 'grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-amber-400 to-brand-500 text-2xl shadow-md shadow-orange-950/10' }, '\ud83c\udf54'),
+                    e('span', null,
+                        e('span', { className: 'block text-xl font-black leading-tight tracking-tight ' + (props.dark ? 'text-white' : 'text-slate-950') }, 'Quick Bite'),
+                        e('span', { className: 'block text-[9px] font-extrabold uppercase tracking-[0.16em] text-brand-500' }, props.tagline)
+                    )
+                );
+            }
+
+            function CustomerNavigation(props) {
+                var currentPath = window.location.pathname.toLowerCase();
+
+                function linkItem(link, mobile) {
+                    var active = currentPath === link.href.toLowerCase();
+                    return e('a', {
+                        key: link.label,
+                        href: link.href,
+                        onClick: function () { props.setOpen(false); },
+                        'aria-current': active ? 'page' : undefined,
+                        className: (mobile ? 'flex w-full items-center gap-3 ' : '') +
+                            'rounded-lg px-3 py-2 text-sm font-bold ' +
+                            (active ? 'bg-brand-50 text-brand-600' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950')
+                    }, mobile && e('span', { className: 'w-5 text-center text-base' }, link.icon), link.label);
+                }
+
+                return e(React.Fragment, null,
+                    e('div', { className: 'ui-shell flex min-h-16 items-center justify-between gap-4 py-2.5' },
+                        e(Brand, { home: props.area === 'user' ? '/UserHome' : '/', tagline: 'Good Food. Fast Delivery.', dark: false }),
+                        e('nav', { className: 'hidden items-center gap-1 md:flex', 'aria-label': 'Primary navigation' },
+                            props.links.map(function (link) { return linkItem(link, false); })
+                        ),
+                        e('button', {
+                            type: 'button',
+                            className: 'grid h-10 w-10 place-items-center rounded-lg border border-slate-200 text-xl font-bold text-slate-700 hover:bg-slate-100 md:hidden',
+                            onClick: function () { props.setOpen(!props.isOpen); },
+                            'aria-expanded': props.isOpen,
+                            'aria-controls': 'mobile-navigation',
+                            'aria-label': props.isOpen ? 'Close navigation' : 'Open navigation'
+                        }, props.isOpen ? '\u00d7' : '\u2630')
+                    ),
+                    props.isOpen && e('nav', { id: 'mobile-navigation', className: 'ui-shell grid gap-1 border-t border-slate-100 py-3 md:hidden', 'aria-label': 'Mobile navigation' },
+                        props.links.map(function (link) { return linkItem(link, true); })
+                    )
+                );
+            }
+
+            function DashboardNavigation(props) {
+                var currentPath = window.location.pathname.toLowerCase();
+                var panelName = props.area === 'admin' ? 'ADMIN PANEL' : 'RESTAURANT PANEL';
+                var home = props.area === 'admin' ? '/adminHome' : '/RestaurantHome';
+
+                function sideLink(link) {
+                    var active = currentPath === link.href.toLowerCase();
+                    return e('a', {
+                        key: link.label,
+                        href: link.href,
+                        onClick: function () { props.setOpen(false); },
+                        'aria-current': active ? 'page' : undefined,
+                        className: 'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold ' +
+                            (active ? 'bg-brand-500 text-white shadow-lg shadow-orange-950/20' : 'text-slate-300 hover:bg-white/8 hover:text-white')
+                    }, e('span', { className: 'grid h-6 w-6 place-items-center text-lg' }, link.icon), e('span', null, link.label));
+                }
+
+                return e(React.Fragment, null,
+                    e('div', { className: 'flex min-h-16 items-center justify-between px-4 py-2.5 lg:hidden' },
+                        e(Brand, { home: home, tagline: panelName, dark: true }),
+                        e('button', {
+                            type: 'button',
+                            className: 'grid h-10 w-10 place-items-center rounded-lg border border-white/15 text-xl font-bold text-white hover:bg-white/10',
+                            onClick: function () { props.setOpen(!props.isOpen); },
+                            'aria-expanded': props.isOpen,
+                            'aria-controls': 'dashboard-navigation',
+                            'aria-label': props.isOpen ? 'Close navigation' : 'Open navigation'
+                        }, props.isOpen ? '\u00d7' : '\u2630')
+                    ),
+                    e('aside', {
+                        id: 'dashboard-navigation',
+                        className: (props.isOpen ? 'flex ' : 'hidden ') + 'absolute left-0 right-0 top-16 max-h-[calc(100vh-4rem)] flex-col overflow-y-auto border-t border-slate-800 bg-[#111923] p-4 shadow-2xl lg:static lg:flex lg:h-screen lg:max-h-none lg:border-t-0 lg:shadow-none'
+                    },
+                        e('div', { className: 'hidden px-1 pb-7 pt-2 lg:block' }, e(Brand, { home: home, tagline: panelName, dark: true })),
+                        e('div', { className: 'mb-5 rounded-xl border border-white/8 bg-white/5 p-3' },
+                            e('p', { className: 'text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500' }, panelName),
+                            e('p', { className: 'mt-1 truncate text-sm font-bold text-white' }, props.pageTitle),
+                            e('p', { className: 'mt-1 text-xs text-emerald-400' }, '\u25cf Active')
+                        ),
+                        e('nav', { className: 'grid gap-1', 'aria-label': panelName + ' navigation' }, props.links.map(sideLink)),
+                        e('div', { className: 'mt-auto border-t border-white/10 pt-4' },
+                            e('div', { className: 'flex items-center gap-3 rounded-xl border border-white/10 p-3' },
+                                e('span', { className: 'grid h-9 w-9 place-items-center rounded-full bg-brand-500 font-black text-white' }, props.area === 'admin' ? 'A' : 'R'),
+                                e('span', null,
+                                    e('span', { className: 'block text-sm font-bold text-white' }, props.area === 'admin' ? 'Administrator' : 'Restaurant Owner'),
+                                    e('span', { className: 'block text-[10px] uppercase tracking-wider text-slate-500' }, 'Quick Bite')
+                                )
+                            )
+                        )
+                    )
+                );
+            }
+
+            function SupportChatbot(props) {
+                var openState = React.useState(false);
+                var isOpen = openState[0];
+                var setOpen = openState[1];
+                var inputState = React.useState('');
+                var input = inputState[0];
+                var setInput = inputState[1];
+                var messagesState = React.useState([
+                    { from: 'bot', text: 'Hi! I am the Quick Bite assistant. How can I help you today?' }
+                ]);
+                var messages = messagesState[0];
+                var setMessages = messagesState[1];
+                var messageList = React.useRef(null);
+
+                var suggestions = props.area === 'restaurant'
+                    ? ['How do I add food?', 'How do I view orders?', 'How do I delete my restaurant?']
+                    : props.area === 'admin'
+                        ? ['How do I add a restaurant?', 'How do I manage restaurants?', 'How do I delete a restaurant?']
+                        : ['How do I order food?', 'Where is my cart?', 'How do menu filters work?'];
+
+                React.useEffect(function () {
+                    if (messageList.current) {
+                        messageList.current.scrollTop = messageList.current.scrollHeight;
+                    }
+                }, [messages, isOpen]);
+
+                function getReply(question) {
+                    var text = question.toLowerCase();
+
+                    if (text.includes('hello') || text.includes('hi') || text.includes('hey'))
+                        return 'Hello! Ask me about restaurants, food, cart, checkout, orders, or account management.';
+                    if (text.includes('filter') || text.includes('popular') || text.includes('beverage'))
+                        return 'Open a restaurant from Customer Home, then use Recommended, Popular, or a category button such as Beverages to filter only that restaurant\'s menu.';
+                    if (text.includes('cart'))
+                        return 'Select a restaurant, press ADD on a food item, then open Cart from the top navigation or use the View Cart button.';
+                    if (text.includes('checkout') || text.includes('payment'))
+                        return 'Open your cart, review the items, continue to checkout, select a payment method, and confirm the order.';
+                    if (text.includes('order') && (text.includes('track') || text.includes('history') || text.includes('my')))
+                        return 'Use My Orders in the customer navigation to view your order history and current status.';
+                    if (text.includes('view orders') || text.includes('new orders'))
+                        return 'Restaurant owners can open Show Orders from the dashboard menu to review, accept, or reject orders.';
+                    if (text.includes('add food') || text.includes('register food'))
+                        return 'From Restaurant Home, choose Add Food or Register Food, enter the details, select a category, upload a matching image, and save.';
+                    if (text.includes('add category') || text.includes('register category'))
+                        return 'From the restaurant dashboard, open Register Category, enter the category name and image, then save it.';
+                    if (text.includes('add restaurant'))
+                        return 'Administrators can open Add Restaurant from the Admin dashboard and complete the restaurant profile form.';
+                    if (text.includes('manage restaurant') || text.includes('all restaurant'))
+                        return 'Open All Restaurants from the Admin dashboard to search, review, and delete registered restaurants.';
+                    if (text.includes('delete') && text.includes('restaurant'))
+                        return props.area === 'restaurant'
+                            ? 'Use Delete Restaurant on Restaurant Home. Confirm carefully: its foods, related cart entries, orders, and login account will also be removed.'
+                            : 'Administrators can delete a restaurant from All Restaurants. Restaurant owners can use Delete Restaurant on their own dashboard.';
+                    if (text.includes('login') || text.includes('sign in'))
+                        return 'Open Sign in, enter your registered email and password, and the system will take you to the correct customer, restaurant, or admin dashboard.';
+                    if (text.includes('logout'))
+                        return 'Use Logout in the top navigation or dashboard sidebar to end your session securely.';
+                    if (text.includes('restaurant') || text.includes('menu'))
+                        return 'Open Customer Home and select any restaurant card to see that restaurant\'s menu, categories, prices, and food photos.';
+                    if (text.includes('contact') || text.includes('support') || text.includes('help'))
+                        return 'I can help with ordering, menus, cart, checkout, orders, login, and restaurant management. Tell me what you are trying to do.';
+
+                    return 'I did not fully understand that. Try asking about ordering food, menu filters, cart, checkout, orders, login, adding food, or managing a restaurant.';
+                }
+
+                function sendMessage(question) {
+                    var cleanQuestion = (question || '').trim();
+                    if (!cleanQuestion) return;
+                    setMessages(function (current) {
+                        return current.concat(
+                            { from: 'user', text: cleanQuestion },
+                            { from: 'bot', text: getReply(cleanQuestion) }
+                        );
+                    });
+                    setInput('');
+                }
+
+                function submitMessage(event) {
+                    event.preventDefault();
+                    sendMessage(input);
+                }
+
+                return e(React.Fragment, null,
+                    isOpen && e('section', {
+                        className: 'fixed bottom-20 right-3 z-[100] flex h-[min(34rem,calc(100vh-6rem))] w-[calc(100vw-1.5rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl sm:right-5',
+                        role: 'dialog',
+                        'aria-label': 'Quick Bite support chatbot'
+                    },
+                        e('header', { className: 'flex items-center justify-between bg-gradient-to-r from-brand-500 to-brand-600 px-4 py-3 text-white' },
+                            e('div', { className: 'flex items-center gap-3' },
+                                e('span', { className: 'grid h-10 w-10 place-items-center rounded-full bg-white/20 text-xl' }, '\ud83e\udd16'),
+                                e('div', null,
+                                    e('h2', { className: 'font-black' }, 'Quick Bite Assistant'),
+                                    e('p', { className: 'text-xs text-orange-100' }, '\u25cf Online support')
+                                )
+                            ),
+                            e('button', { type: 'button', onClick: function () { setOpen(false); }, className: 'grid h-9 w-9 place-items-center rounded-lg text-2xl hover:bg-white/15', 'aria-label': 'Close chatbot' }, '\u00d7')
+                        ),
+                        e('div', { ref: messageList, className: 'flex-1 space-y-3 overflow-y-auto bg-slate-50 p-4', 'aria-live': 'polite' },
+                            messages.map(function (message, index) {
+                                return e('div', { key: index, className: 'flex ' + (message.from === 'user' ? 'justify-end' : 'justify-start') },
+                                    e('p', { className: 'max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-5 shadow-sm ' + (message.from === 'user' ? 'rounded-br-md bg-brand-500 text-white' : 'rounded-bl-md border border-slate-200 bg-white text-slate-700') }, message.text)
+                                );
+                            })
+                        ),
+                        e('div', { className: 'flex gap-2 overflow-x-auto border-t border-slate-100 px-3 py-2' },
+                            suggestions.map(function (suggestion) {
+                                return e('button', { key: suggestion, type: 'button', onClick: function () { sendMessage(suggestion); }, className: 'shrink-0 rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-xs font-bold text-brand-700 hover:bg-orange-100' }, suggestion);
+                            })
+                        ),
+                        e('form', { onSubmit: submitMessage, className: 'flex gap-2 border-t border-slate-200 bg-white p-3' },
+                            e('input', { value: input, onChange: function (event) { setInput(event.target.value); }, className: 'ui-input min-w-0 flex-1', placeholder: 'Type your question...', 'aria-label': 'Chat message', autoComplete: 'off' }),
+                            e('button', { type: 'submit', className: 'ui-button-primary h-10 w-11 shrink-0 px-0', 'aria-label': 'Send message' }, '\u2191')
+                        )
+                    ),
+                    e('button', {
+                        type: 'button',
+                        onClick: function () { setOpen(!isOpen); },
+                        className: 'fixed bottom-5 right-5 z-[100] grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-brand-600 text-2xl text-white shadow-xl shadow-orange-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-brand-200',
+                        'aria-expanded': isOpen,
+                        'aria-label': isOpen ? 'Close support chatbot' : 'Open support chatbot',
+                        title: 'Chat with Quick Bite'
+                    }, isOpen ? '\u00d7' : '\ud83d\udcac')
+                );
+            }
+
+            function GlobalUserExperience(props) {
+                var topState = React.useState(false);
+                var showBackToTop = topState[0];
+                var setShowBackToTop = topState[1];
+                var onlineState = React.useState(window.navigator.onLine);
+                var isOnline = onlineState[0];
+                var setOnline = onlineState[1];
+                var navigationState = React.useState(false);
+                var isNavigating = navigationState[0];
+                var setNavigating = navigationState[1];
+
+                React.useEffect(function () {
+                    function handleScroll() { setShowBackToTop(window.scrollY > 420); }
+                    function handleOnline() { setOnline(true); }
+                    function handleOffline() { setOnline(false); }
+                    function handleSubmit(event) {
+                        if (event.defaultPrevented) return;
+                        var form = event.target;
+                        if (!form || form.tagName !== 'FORM' || !form.checkValidity()) return;
+                        var button = event.submitter || form.querySelector('button[type="submit"], input[type="submit"]');
+                        if (!button || button.getAttribute('aria-busy') === 'true') return;
+                        button.dataset.quickBiteLabel = button.innerHTML;
+                        setNavigating(true);
+                        window.setTimeout(function () {
+                            button.setAttribute('aria-busy', 'true');
+                            button.disabled = true;
+                            if (button.tagName === 'BUTTON') button.textContent = 'Please wait';
+                        }, 0);
+                    }
+                    function handleLinkClick(event) {
+                        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                        var link = event.target.closest && event.target.closest('a[href]');
+                        if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
+                        var url = new URL(link.href, window.location.href);
+                        if (url.origin !== window.location.origin) return;
+                        if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash) return;
+                        setNavigating(true);
+                    }
+                    function restoreButtons() {
+                        setNavigating(false);
+                        document.querySelectorAll('[data-quick-bite-label]').forEach(function (button) {
+                            button.innerHTML = button.dataset.quickBiteLabel;
+                            button.removeAttribute('aria-busy');
+                            button.disabled = false;
+                            delete button.dataset.quickBiteLabel;
+                        });
+                    }
+
+                    var revealTargets = Array.prototype.slice.call(document.querySelectorAll('.ui-card, .stat-card, main > section'));
+                    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                    var revealObserver;
+                    if ('IntersectionObserver' in window && !reduceMotion) {
+                        revealTargets.forEach(function (item) { item.classList.add('qb-reveal'); });
+                        revealObserver = new IntersectionObserver(function (entries) {
+                            entries.forEach(function (entry) {
+                                if (!entry.isIntersecting) return;
+                                entry.target.classList.add('qb-reveal-visible');
+                                revealObserver.unobserve(entry.target);
+                            });
+                        }, { threshold: 0.08, rootMargin: '0px 0px -28px 0px' });
+                        revealTargets.forEach(function (item) { revealObserver.observe(item); });
+                    } else {
+                        revealTargets.forEach(function (item) { item.classList.add('qb-reveal-visible'); });
+                    }
+
+                    handleScroll();
+                    window.addEventListener('scroll', handleScroll, { passive: true });
+                    window.addEventListener('online', handleOnline);
+                    window.addEventListener('offline', handleOffline);
+                    window.addEventListener('pageshow', restoreButtons);
+                    document.addEventListener('submit', handleSubmit);
+                    document.addEventListener('click', handleLinkClick);
+                    return function () {
+                        window.removeEventListener('scroll', handleScroll);
+                        window.removeEventListener('online', handleOnline);
+                        window.removeEventListener('offline', handleOffline);
+                        window.removeEventListener('pageshow', restoreButtons);
+                        document.removeEventListener('submit', handleSubmit);
+                        document.removeEventListener('click', handleLinkClick);
+                        if (revealObserver) revealObserver.disconnect();
+                    };
+                }, []);
+
+                return e(React.Fragment, null,
+                    isNavigating && e('div', {
+                        role: 'progressbar',
+                        'aria-label': 'Loading page',
+                        className: 'fixed inset-x-0 top-0 z-[120] h-1 overflow-hidden bg-brand-100'
+                    }, e('span', { className: 'qb-route-progress block h-full w-1/2 origin-left bg-gradient-to-r from-brand-400 via-brand-500 to-brand-700 shadow-[0_0_12px_rgba(255,90,22,.7)]' })),
+                    !isOnline && e('div', {
+                        role: 'status',
+                        className: 'fixed left-1/2 top-3 z-[100] -translate-x-1/2 rounded-lg bg-slate-950 px-4 py-2 text-sm font-bold text-white shadow-xl'
+                    }, 'You are offline. Check your internet connection.'),
+                    e(SupportChatbot, { area: props.area }),
+                    showBackToTop && e('button', {
+                        type: 'button',
+                        onClick: function () { window.scrollTo({ top: 0, behavior: 'smooth' }); },
+                        className: 'fixed bottom-5 right-20 z-40 grid h-11 w-11 place-items-center rounded-full bg-slate-800 text-lg font-black text-white shadow-xl hover:bg-slate-900 focus:outline-none focus:ring-4 focus:ring-slate-200',
+                        'aria-label': 'Back to top',
+                        title: 'Back to top'
+                    }, '\u2191')
+                );
+            }
+
+            function AppHeader() {
+                var state = React.useState(false);
+                var isOpen = state[0];
+                var setOpen = state[1];
+                var area = mountNode.dataset.area || 'public';
+                var pageTitle = mountNode.dataset.title || 'Quick Bite';
+                var links = navigation[area] || navigation.public;
+                var props = { area: area, pageTitle: pageTitle, links: links, isOpen: isOpen, setOpen: setOpen };
+                return area === 'admin' || area === 'restaurant' ? e(DashboardNavigation, props) : e(CustomerNavigation, props);
+            }
+
+            ReactDOM.createRoot(mountNode).render(e(AppHeader));
+            var uxNode = document.createElement('div');
+            uxNode.id = 'quick-bite-react-ux';
+            document.body.appendChild(uxNode);
+            ReactDOM.createRoot(uxNode).render(e(GlobalUserExperience, { area: mountNode.dataset.area || 'public' }));
+        }());
+    </script>
+</th:block>
+</body>
+</html>

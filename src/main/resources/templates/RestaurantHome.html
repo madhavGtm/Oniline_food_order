@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="~{fragments :: appHead('Restaurant Dashboard')}"></th:block>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            width: 100%;
+            min-height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            background:
+                    radial-gradient(circle at 100% 0, rgba(255, 226, 209, 0.48), transparent 26rem),
+                    linear-gradient(180deg, #fffaf7 0, #f7f8fa 22rem, #f7f8fa 100%);
+        }
+
+        .dashboard-card {
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            border-radius: 22px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.99), rgba(255, 252, 249, 0.96));
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.065);
+            transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+        }
+
+        .dashboard-card:hover {
+            border-color: rgba(251, 146, 60, 0.32);
+            box-shadow: 0 18px 42px rgba(15, 23, 42, 0.09);
+        }
+
+        .dashboard-card a,
+        .dashboard-card button {
+            transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+        }
+
+        .dashboard-card a:active,
+        .dashboard-card button:active {
+            transform: scale(0.98);
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-scroll::-webkit-scrollbar {
+            height: 7px;
+        }
+
+        .table-scroll::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, #fdba74, #f97316);
+            border-radius: 10px;
+        }
+
+        .order-donut {
+            position: relative;
+            display: grid;
+            width: 126px;
+            height: 126px;
+            flex: 0 0 auto;
+            place-items: center;
+            border-radius: 9999px;
+            background: conic-gradient(
+                    #ef4444 0 33.33%,
+                    #fbbf24 33.33% 60%,
+                    #3b82f6 60% 80%,
+                    #22c55e 80% 100%
+            );
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .5), 0 12px 24px rgba(15, 23, 42, .08);
+        }
+
+        .order-donut::before {
+            content: "";
+            position: absolute;
+            width: 82px;
+            height: 82px;
+            border-radius: inherit;
+            background: #fff;
+            box-shadow: 0 0 0 1px rgba(226, 232, 240, .8);
+        }
+
+        .order-donut-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .seller-thumb {
+            width: 48px;
+            height: 48px;
+            flex: 0 0 auto;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, .12);
+        }
+
+        .restaurant-dashboard-main {
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        @media (max-width: 640px) {
+            .dashboard-card {
+                border-radius: 17px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .restaurant-dashboard-main {
+                width: calc(100% - 16rem);
+                margin-right: 0;
+                margin-left: 16rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-slate-50 text-slate-900">
+
+<!-- Reference-style fixed restaurant panel on desktop and collapsible navigation on mobile. -->
+<header th:replace="~{fragments :: reactHeader('Dashboard', 'restaurant')}"></header>
+
+<main class="restaurant-dashboard-main w-full max-w-[1600px] px-3 py-5 sm:px-5 lg:px-7 xl:px-8">
+
+    <!-- Top Header -->
+    <section class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+
+        <div class="min-w-0">
+
+            <p class="text-xs font-black uppercase tracking-[0.16em] text-orange-500">
+                Restaurant panel
+            </p>
+
+            <h1 class="mt-1 break-words text-2xl font-black leading-tight sm:text-3xl">
+
+                Welcome back,
+
+                <span th:text="${restaurant.restaurantName}">
+                    Restaurant
+                </span>!
+
+                <span aria-hidden="true">&#128075;</span>
+            </h1>
+
+            <p class="mt-1 text-sm text-slate-500">
+                Here&apos;s what&apos;s happening with your restaurant today.
+            </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+
+            <button type="button"
+                    class="relative grid h-11 w-11 place-items-center rounded-xl
+                           border border-slate-200 bg-white shadow-sm">
+
+                &#128276;
+
+                <span class="absolute -right-1 -top-1 grid h-5 w-5
+                             place-items-center rounded-full bg-red-500
+                             text-[10px] font-bold text-white">
+                    5
+                </span>
+            </button>
+
+            <div class="rounded-xl border border-slate-200
+                        bg-white px-4 py-3 text-sm font-semibold shadow-sm">
+
+                &#128197;&nbsp;
+                <span id="dashboardDate"></span>
+            </div>
+
+            <form th:action="@{/EditRestaurant}" method="get">
+
+                <button type="submit"
+                        class="ui-button-secondary">
+                    Edit Profile
+                </button>
+            </form>
+
+            <form th:action="@{/foodRegister}" method="get">
+
+                <button type="submit"
+                        class="ui-button-primary">
+                    + Add Food
+                </button>
+            </form>
+
+            <form th:action="@{/DeleteRestaurant}" method="post">
+                <button type="submit"
+                        class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl
+                               border border-rose-200 bg-white px-4 py-2 text-sm font-black
+                               text-rose-700 shadow-sm hover:bg-rose-50"
+                        onclick="return confirm('Permanently delete this restaurant and its login account? This action cannot be undone.')">
+                    <span aria-hidden="true">&#128465;</span>
+                    Delete Restaurant
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Statistics -->
+    <section class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+        <article class="dashboard-card flex items-center gap-4 p-5">
+
+            <span class="grid h-14 w-14 shrink-0 place-items-center
+                         rounded-full bg-orange-50 text-2xl text-orange-500">
+                &#128717;
+            </span>
+
+            <div class="min-w-0">
+
+                <p class="text-sm text-slate-500">
+                    Today&apos;s Orders
+                </p>
+
+                <p class="mt-1 text-2xl font-black">
+                    35
+                </p>
+
+                <p class="mt-1 text-xs text-slate-400">
+                    <span class="font-bold text-orange-500">+12%</span>
+                    from yesterday
+                </p>
+            </div>
+        </article>
+
+        <article class="dashboard-card flex items-center gap-4 p-5">
+
+            <span class="grid h-14 w-14 shrink-0 place-items-center
+                         rounded-full bg-emerald-50
+                         text-3xl font-black text-emerald-600">
+                &#8377;
+            </span>
+
+            <div class="min-w-0">
+
+                <p class="text-sm text-slate-500">
+                    Today&apos;s Revenue
+                </p>
+
+                <p class="mt-1 text-2xl font-black">
+                    &#8377;12,500
+                </p>
+
+                <p class="mt-1 text-xs text-slate-400">
+                    <span class="font-bold text-emerald-600">+18%</span>
+                    from yesterday
+                </p>
+            </div>
+        </article>
+
+        <article class="dashboard-card flex items-center gap-4 p-5">
+
+            <span class="grid h-14 w-14 shrink-0 place-items-center
+                         rounded-full bg-violet-50
+                         text-2xl text-violet-600">
+                &#127869;
+            </span>
+
+            <div class="min-w-0">
+
+                <p class="text-sm text-slate-500">
+                    Total Food Items
+                </p>
+
+                <p class="mt-1 text-2xl font-black">
+                    45
+                </p>
+
+                <a th:href="@{/showFood}"
+                   class="mt-1 block text-xs font-bold text-violet-600">
+                    View all foods
+                </a>
+            </div>
+        </article>
+
+        <article class="dashboard-card flex items-center gap-4 p-5">
+
+            <span class="grid h-14 w-14 shrink-0 place-items-center
+                         rounded-full bg-amber-50
+                         text-2xl text-amber-600">
+                &#9783;
+            </span>
+
+            <div class="min-w-0">
+
+                <p class="text-sm text-slate-500">
+                    Categories
+                </p>
+
+                <p class="mt-1 text-2xl font-black">
+                    8
+                </p>
+
+                <a th:href="@{/showCategory}"
+                   class="mt-1 block text-xs font-bold text-amber-600">
+                    View categories
+                </a>
+            </div>
+        </article>
+    </section>
+
+    <!-- Main Columns -->
+    <section class="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_24rem]">
+
+        <!-- Left Content -->
+        <div class="min-w-0 space-y-5">
+
+            <!-- Quick Actions -->
+            <section class="dashboard-card p-4 sm:p-6">
+
+                <div class="border-b border-slate-100 pb-4">
+
+                    <p class="text-xs font-black uppercase
+                              tracking-[0.16em] text-orange-500">
+                        Quick actions
+                    </p>
+
+                    <h2 class="mt-1 text-xl font-black">
+                        Manage your restaurant
+                    </h2>
+                </div>
+
+                <div class="mt-5 grid grid-cols-1 gap-4
+                            sm:grid-cols-2 lg:grid-cols-4">
+
+                    <a th:href="@{/categoryRegister}"
+                       class="rounded-xl border border-orange-100
+                              bg-orange-50 p-5 text-center
+                              transition hover:-translate-y-1
+                              hover:shadow-md">
+
+                        <span class="mx-auto grid h-12 w-12
+                                     place-items-center text-3xl
+                                     text-orange-500">
+                            &#9783;
+                        </span>
+
+                        <p class="mt-3 font-black text-orange-600">
+                            Register Category
+                        </p>
+                    </a>
+
+                    <a th:href="@{/foodRegister}"
+                       class="rounded-xl border border-emerald-100
+                              bg-emerald-50 p-5 text-center
+                              transition hover:-translate-y-1
+                              hover:shadow-md">
+
+                        <span class="mx-auto grid h-12 w-12
+                                     place-items-center text-3xl
+                                     text-emerald-600">
+                            &#127829;
+                        </span>
+
+                        <p class="mt-3 font-black text-emerald-700">
+                            Register Food
+                        </p>
+                    </a>
+
+                    <a th:href="@{/showOrders}"
+                       class="rounded-xl border border-sky-100
+                              bg-sky-50 p-5 text-center
+                              transition hover:-translate-y-1
+                              hover:shadow-md">
+
+                        <span class="mx-auto grid h-12 w-12
+                                     place-items-center text-3xl
+                                     text-sky-600">
+                            &#128717;
+                        </span>
+
+                        <p class="mt-3 font-black text-sky-700">
+                            View New Orders
+                        </p>
+                    </a>
+
+                    <a th:href="@{/showOrders}"
+                       class="rounded-xl border border-violet-100
+                              bg-violet-50 p-5 text-center
+                              transition hover:-translate-y-1
+                              hover:shadow-md">
+
+                        <span class="mx-auto grid h-12 w-12
+                                     place-items-center text-3xl
+                                     text-violet-600">
+                            &#128196;
+                        </span>
+
+                        <p class="mt-3 font-black text-violet-700">
+                            Order History
+                        </p>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Recent Orders -->
+            <section class="dashboard-card overflow-hidden">
+
+                <div class="flex flex-col gap-2 p-5
+                            sm:flex-row sm:items-center sm:justify-between">
+
+                    <h2 class="text-xl font-black">
+                        Recent Orders
+                    </h2>
+
+                    <a th:href="@{/showOrders}"
+                       class="text-sm font-bold text-orange-500">
+                        View All Orders
+                    </a>
+                </div>
+
+                <div class="table-scroll">
+
+                    <table class="w-full min-w-[780px] text-left text-sm">
+
+                        <thead class="border-y border-slate-200
+                                      bg-slate-50 text-xs text-slate-500">
+
+                        <tr>
+                            <th class="px-5 py-4">Order ID</th>
+                            <th class="px-5 py-4">Customer</th>
+                            <th class="px-5 py-4">Items</th>
+                            <th class="px-5 py-4">Amount</th>
+                            <th class="px-5 py-4">Status</th>
+                            <th class="px-5 py-4">Action</th>
+                        </tr>
+                        </thead>
+
+                        <tbody class="divide-y divide-slate-100">
+
+                        <tr th:each="order : ${orders}">
+
+                            <td class="px-5 py-4 font-bold"
+                                th:text="${'#QB' + order.id}">
+                                #QB101
+                            </td>
+
+                            <td class="px-5 py-4"
+                                th:text="${order.user != null
+                                         ? order.user.name
+                                         : 'Customer'}">
+                                Customer
+                            </td>
+
+                            <td class="px-5 py-4 text-slate-600">
+                                Food items
+                            </td>
+
+                            <td class="px-5 py-4 font-bold">
+
+                                &#8377;
+
+                                <span th:text="${order.totalPrice}">
+                                    0
+                                </span>
+                            </td>
+
+                            <td class="px-5 py-4">
+
+                                <span class="rounded-md bg-orange-50
+                                             px-3 py-1 text-xs
+                                             font-bold text-orange-600"
+                                      th:text="${order.orderStatus}">
+                                    New
+                                </span>
+                            </td>
+
+                            <td class="px-5 py-4">
+
+                                <div class="flex gap-2">
+
+                                    <a th:href="@{/showOrders}"
+                                       class="grid h-9 w-9 place-items-center
+                                              rounded-lg border border-slate-200">
+                                        &#128065;
+                                    </a>
+
+                                    <a th:href="@{/acceptOrder(id=${order.id})}"
+                                       class="grid h-9 w-9 place-items-center
+                                              rounded-lg bg-emerald-600
+                                              font-black text-white">
+                                        &#10003;
+                                    </a>
+
+                                    <a th:href="@{/rejectOrder(id=${order.id})}"
+                                       class="grid h-9 w-9 place-items-center
+                                              rounded-lg bg-red-500
+                                              font-black text-white">
+                                        &#10005;
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:if="${orders == null or #lists.isEmpty(orders)}"
+                     class="p-8 text-center text-sm text-slate-500">
+
+                    No recent orders are available.
+                </div>
+            </section>
+        </div>
+
+        <!-- Right Content -->
+        <aside class="space-y-5">
+
+            <!-- New Order Card -->
+            <section class="dashboard-card border-orange-200 p-5">
+
+                <h2 class="flex items-center gap-2
+                           text-lg font-black text-orange-600">
+                    &#128276; New Order Received
+                </h2>
+
+                <div th:if="${orders != null and !#lists.isEmpty(orders)}"
+                     th:with="latestOrder=${orders[0]}"
+                     class="mt-5 space-y-4 text-sm">
+
+                    <div class="flex justify-between gap-4">
+                        <span class="text-slate-500">Order ID</span>
+                        <span class="font-black" th:text="${'#QB' + latestOrder.id}">#QB106</span>
+                    </div>
+
+                    <div class="flex justify-between gap-4">
+                        <span class="text-slate-500">Customer</span>
+                        <span class="font-bold"
+                              th:text="${latestOrder.user != null ? latestOrder.user.name : 'Customer'}">
+                            Customer Name
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between gap-4">
+                        <span class="text-slate-500">Amount</span>
+                        <span class="text-lg font-black">
+                            &#8377;<span th:text="${latestOrder.totalPrice}">598</span>
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 pt-1">
+                        <a th:href="@{/acceptOrder(id=${latestOrder.id})}"
+                           class="rounded-xl bg-emerald-600 px-3 py-3 text-center text-sm font-bold text-white shadow-lg shadow-emerald-100 hover:bg-emerald-700">
+                            &#10003; Accept
+                        </a>
+
+                        <a th:href="@{/rejectOrder(id=${latestOrder.id})}"
+                           class="rounded-xl bg-red-500 px-3 py-3 text-center text-sm font-bold text-white shadow-lg shadow-red-100 hover:bg-red-600">
+                            &#10005; Reject
+                        </a>
+                    </div>
+                </div>
+
+                <div th:if="${orders == null or #lists.isEmpty(orders)}"
+                     class="mt-5 rounded-2xl border border-dashed border-orange-200 bg-orange-50 p-5 text-center">
+                    <p class="text-sm font-semibold text-slate-600">No new orders right now.</p>
+                    <a th:href="@{/showOrders}"
+                       class="mt-3 inline-flex text-sm font-black text-orange-600 hover:text-orange-700">
+                        Check all orders &#8594;
+                    </a>
+                </div>
+            </section>
+
+            <!-- Order Status Summary -->
+            <section class="dashboard-card p-5">
+                <div class="flex items-center justify-between gap-3">
+                    <h2 class="text-lg font-black">Order Status Summary</h2>
+                    <a th:href="@{/showOrders}" class="text-xs font-black text-orange-600">View all</a>
+                </div>
+
+                <div class="mt-5 flex flex-col items-center gap-6 sm:flex-row xl:flex-row">
+                    <div class="order-donut" aria-label="Order status chart">
+                        <div class="order-donut-content">
+                            <strong class="block text-2xl font-black text-slate-950"
+                                    th:text="${orders != null ? #lists.size(orders) : 0}">15</strong>
+                            <span class="text-[10px] font-bold text-slate-400">Total Orders</span>
+                        </div>
+                    </div>
+
+                    <ul class="grid min-w-0 flex-1 gap-3 text-xs font-semibold text-slate-600">
+                        <li class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-red-500"></span>New</li>
+                        <li class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-amber-400"></span>Preparing</li>
+                        <li class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-blue-500"></span>On The Way</li>
+                        <li class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-green-500"></span>Delivered</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Top Selling Items -->
+            <section class="dashboard-card p-5">
+                <div class="flex items-center justify-between gap-3">
+                    <h2 class="text-lg font-black">Top Selling Items</h2>
+                    <a th:href="@{/showFood}" class="text-xs font-black text-orange-600">View all</a>
+                </div>
+
+                <ol class="mt-4 divide-y divide-slate-100">
+                    <li class="flex items-center gap-3 py-3">
+                        <img th:src="@{/images/pizza.avif}" alt="Farmhouse Pizza" class="seller-thumb">
+                        <span class="min-w-0 flex-1 truncate text-sm font-bold">1. Farmhouse Pizza</span>
+                        <span class="text-xs font-semibold text-slate-400">120 Orders</span>
+                    </li>
+                    <li class="flex items-center gap-3 py-3">
+                        <img th:src="@{/images/pizza.avif}" alt="Cheese Burst Pizza" class="seller-thumb">
+                        <span class="min-w-0 flex-1 truncate text-sm font-bold">2. Cheese Burst Pizza</span>
+                        <span class="text-xs font-semibold text-slate-400">98 Orders</span>
+                    </li>
+                    <li class="flex items-center gap-3 py-3">
+                        <img th:src="@{/images/burger.avif}" alt="Veg Burger" class="seller-thumb">
+                        <span class="min-w-0 flex-1 truncate text-sm font-bold">3. Veg Burger</span>
+                        <span class="text-xs font-semibold text-slate-400">85 Orders</span>
+                    </li>
+                    <li class="flex items-center gap-3 py-3">
+                        <img th:src="@{/images/rest1.jpg}" alt="Garlic Bread" class="seller-thumb">
+                        <span class="min-w-0 flex-1 truncate text-sm font-bold">4. Garlic Bread</span>
+                        <span class="text-xs font-semibold text-slate-400">76 Orders</span>
+                    </li>
+                </ol>
+            </section>
+        </aside>
+    </section>
+</main>
+
+<th:block th:replace="~{fragments :: reactScripts}"></th:block>
+
+<script>
+    const dateElement = document.getElementById("dashboardDate");
+
+    if (dateElement) {
+        dateElement.textContent =
+            new Intl.DateTimeFormat("en-IN", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            }).format(new Date());
+    }
+</script>
+
+</body>
+</html>

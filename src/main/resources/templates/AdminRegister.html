@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments :: appHead('Admin registration')}"></th:block>
+</head>
+<body>
+<header th:replace="~{fragments :: reactHeader('Admin registration', 'public')}"></header>
+
+<main class="ui-page">
+    <section class="ui-card mx-auto max-w-2xl p-6 sm:p-10">
+        <p class="ui-kicker">Administration</p>
+        <h1 class="ui-title">Create an admin profile</h1>
+        <p class="ui-subtitle">Register the account used to manage restaurants.</p>
+
+        <form action="/saveAdmin" method="post" class="mt-8 grid gap-5 sm:grid-cols-2">
+            <div><label for="name" class="ui-label">Full name</label><input id="name" type="text" name="name" class="ui-input" placeholder="Admin name" autocomplete="name" required></div>
+            <div><label for="contact" class="ui-label">Contact number</label><input id="contact" type="tel" name="contact" class="ui-input" placeholder="Phone number" autocomplete="tel" required></div>
+            <div class="sm:col-span-2"><label for="address" class="ui-label">Address</label><input id="address" type="text" name="address" class="ui-input" placeholder="Street, area and city" autocomplete="street-address" required></div>
+            <div class="sm:col-span-2"><label for="email" class="ui-label">Email address</label><input id="email" type="email" name="email" class="ui-input" placeholder="admin@example.com" autocomplete="email" required></div>
+            <div class="sm:col-span-2"><label for="password" class="ui-label">Password</label><input id="password" type="password" name="password" class="ui-input" placeholder="Create a secure password" autocomplete="new-password" required></div>
+            <button type="submit" class="ui-button-primary mt-2 w-full sm:col-span-2">Register admin</button>
+        </form>
+    </section>
+</main>
+
+<th:block th:replace="~{fragments :: reactScripts}"></th:block>
+</body>
+</html>

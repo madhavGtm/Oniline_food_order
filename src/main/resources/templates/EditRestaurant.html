@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments :: appHead('Edit restaurant')}"></th:block>
+</head>
+<body>
+<header th:replace="~{fragments :: reactHeader('Edit restaurant', 'restaurant')}"></header>
+
+<main class="ui-page">
+    <section class="ui-card mx-auto max-w-4xl p-6 sm:p-10">
+        <div class="border-b border-slate-100 pb-7"><p class="ui-kicker">Restaurant settings</p><h1 class="ui-title">Edit restaurant profile</h1><p class="ui-subtitle">Update business details, hours, credentials, or the profile image.</p></div>
+        <form th:action="@{/EditRestaurant}" th:object="${restaurant}" method="post" enctype="multipart/form-data" class="mt-8 grid gap-5 sm:grid-cols-2">
+            <input type="hidden" th:field="*{id}">
+            <input type="hidden" th:field="*{image}">
+            <div class="sm:col-span-2"><label for="restaurantName" class="ui-label">Restaurant name</label><input id="restaurantName" type="text" th:field="*{restaurantName}" class="ui-input" required></div>
+            <div class="sm:col-span-2"><label for="address" class="ui-label">Address</label><textarea id="address" th:field="*{address}" class="ui-input min-h-28 resize-y" required></textarea></div>
+            <div><label for="contact" class="ui-label">Contact number</label><input id="contact" type="tel" th:field="*{contact}" class="ui-input" required></div>
+            <div><label for="email" class="ui-label">Email</label><input id="email" type="email" th:field="*{email}" class="ui-input ui-input-readonly" readonly></div>
+            <div class="sm:col-span-2"><label for="password" class="ui-label">Password</label><input id="password" type="password" th:field="*{password}" class="ui-input" autocomplete="current-password" required></div>
+            <div><label class="ui-label">Current image</label><img th:if="${restaurant.image != null}" th:src="@{'/images/' + ${restaurant.image}}" alt="Current restaurant" class="h-36 w-full rounded-xl object-cover"></div>
+            <div><label for="imageFile" class="ui-label">Upload a new image</label><input id="imageFile" type="file" name="imageFile" accept="image/*" class="ui-input file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-2 file:text-xs file:font-bold file:text-brand-700"><p class="mt-2 text-xs text-slate-400">Leave blank to keep the current image.</p></div>
+            <div><label for="openingTime" class="ui-label">Opening time</label><input id="openingTime" type="time" th:field="*{openingTime}" class="ui-input" required></div>
+            <div><label for="closingTime" class="ui-label">Closing time</label><input id="closingTime" type="time" th:field="*{closingTime}" class="ui-input" required></div>
+            <div class="mt-2 flex flex-col-reverse gap-3 sm:col-span-2 sm:flex-row sm:justify-end"><a th:href="@{/RestaurantHome}" class="ui-button-secondary">Cancel</a><button type="submit" class="ui-button-primary">Save changes</button></div>
+        </form>
+    </section>
+</main>
+
+<th:block th:replace="~{fragments :: reactScripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments :: appHead('Sign in')}"></th:block>
+</head>
+<body>
+<header th:replace="~{fragments :: reactHeader('Sign in', 'public')}"></header>
+
+<main class="ui-page grid min-h-[calc(100vh-4.5rem)] place-items-center">
+    <section class="ui-card grid w-full max-w-4xl overflow-hidden lg:grid-cols-[0.9fr_1.1fr]">
+        <div class="hidden bg-slate-950 p-10 text-white lg:flex lg:flex-col lg:justify-between">
+            <div><p class="ui-kicker text-brand-300">Welcome back</p><h1 class="mt-4 text-4xl font-black leading-tight">Good food is only a sign-in away.</h1></div>
+            <div class="rounded-2xl bg-white/10 p-5 text-sm leading-6 text-slate-300">Use your registered email and password. We&apos;ll take you back to the right dashboard automatically.</div>
+        </div>
+        <div class="p-6 sm:p-10">
+            <p class="ui-kicker">Account access</p>
+            <h1 class="ui-title">Sign in</h1>
+            <p class="ui-subtitle">Enter your details to continue to Quick Bite.</p>
+
+            <form method="post" th:object="${loginDto}" class="mt-8 space-y-5">
+                <div>
+                    <label for="email" class="ui-label">Email address</label>
+                    <input id="email" type="email" th:field="*{email}" class="ui-input" placeholder="you@example.com" autocomplete="email" required>
+                </div>
+                <div>
+                    <label for="password" class="ui-label">Password</label>
+                    <input id="password" type="password" th:field="*{password}" class="ui-input" placeholder="Enter your password" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="ui-button-primary w-full">Sign in</button>
+            </form>
+
+            <p class="mt-6 text-center text-sm text-slate-500">New to Quick Bite? <a th:href="@{/UserRegister}" class="font-bold text-brand-600 hover:text-brand-700">Create an account</a></p>
+        </div>
+    </section>
+</main>
+
+<th:block th:replace="~{fragments :: reactScripts}"></th:block>
+</body>
+</html>
