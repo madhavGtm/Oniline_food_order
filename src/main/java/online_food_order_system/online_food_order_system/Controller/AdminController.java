@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import online_food_order_system.online_food_order_system.models.Admin;
 import online_food_order_system.online_food_order_system.models.Login;
-import online_food_order_system.online_food_order_system.models.Restaurant;
+
 import online_food_order_system.online_food_order_system.services.AdminService;
 import online_food_order_system.online_food_order_system.services.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
