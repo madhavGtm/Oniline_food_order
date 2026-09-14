@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import online_food_order_system.online_food_order_system.models.Admin;
 import online_food_order_system.online_food_order_system.models.Login;
+import online_food_order_system.online_food_order_system.models.Restaurant;
 import online_food_order_system.online_food_order_system.services.AdminService;
 import online_food_order_system.online_food_order_system.services.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +26,29 @@ public class AdminController {
         private LoginService loginService;
 
         // Open Registration Page
-        @GetMapping("/adminRegister")
+        /* @GetMapping("Controller/adminRegister")
         public String adminRegisterPage() {
             return "AdminRegister";
+        } */
+
+    @GetMapping("Controller/adminRegister")
+    public String registerPage(HttpSession session, Model model) {
+
+        String usertype = (String) session.getAttribute("usertype");
+
+        if (usertype == null || !usertype.equalsIgnoreCase("Restaurant")) {
+            return "redirect:/login";
         }
 
+
+        model.addAttribute("admin", new Admin());
+
+        return "AdminRegister";
+    }
+
+
         // Save Admin and Login Details
-        @PostMapping("/saveAdmin")
+        @PostMapping("/Controller/saveAdmin")
         public String saveAdmin(Admin admin, @RequestParam("password") String password,
                                 HttpServletRequest request) {
 
