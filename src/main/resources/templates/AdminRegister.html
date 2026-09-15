@@ -11,7 +11,7 @@
         <h1 class="ui-title">Create an admin profile</h1>
         <p class="ui-subtitle">Register the account used to manage restaurants.</p>
 
-        <form action="/Controller/saveAdmin" method="post" class="mt-8 grid gap-5 sm:grid-cols-2">
+        <form action="/saveAdmin" method="post" class="mt-8 grid gap-5 sm:grid-cols-2">
             <div><label for="name" class="ui-label">Full name</label><input id="name" type="text" name="name" class="ui-input" placeholder="Admin name" autocomplete="name" required></div>
             <div><label for="contact" class="ui-label">Contact number</label><input id="contact" type="tel" name="contact" class="ui-input" placeholder="Phone number" autocomplete="tel" required></div>
             <div class="sm:col-span-2"><label for="address" class="ui-label">Address</label><input id="address" type="text" name="address" class="ui-input" placeholder="Street, area and city" autocomplete="street-address" required></div>
