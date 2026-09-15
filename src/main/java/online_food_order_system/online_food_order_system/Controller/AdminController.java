@@ -26,29 +26,30 @@ public class AdminController {
         private LoginService loginService;
 
         // Open Registration Page
-        /* @GetMapping("Controller/adminRegister")
+      /* @GetMapping("/adminRegister")
         public String adminRegisterPage() {
             return "AdminRegister";
-        } */
+        }
+      */
+        @GetMapping("/adminRegister")
+        public String registerPage(HttpSession session, Model model) {
 
-    @GetMapping("Controller/adminRegister")
-    public String registerPage(HttpSession session, Model model) {
+            String usertype = (String) session.getAttribute("usertype");
 
-        String usertype = (String) session.getAttribute("usertype");
+            if (usertype == null || !usertype.equalsIgnoreCase("Restaurent")) {
+                return "redirect:/login";
+            }
 
-        if (usertype == null || !usertype.equalsIgnoreCase("Restaurant")) {
-            return "redirect:/login";
+            model.addAttribute("Admin", new Admin());
+
+            return "AdminRegister";
         }
 
 
-        model.addAttribute("admin", new Admin());
-
-        return "AdminRegister";
-    }
 
 
-        // Save Admin and Login Details
-        @PostMapping("/Controller/saveAdmin")
+    // Save Admin and Login Details
+        @PostMapping("/saveAdmin")
         public String saveAdmin(Admin admin, @RequestParam("password") String password,
                                 HttpServletRequest request) {
 
